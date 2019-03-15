@@ -1,0 +1,13 @@
+.certificateItem{
+    margin-left: 15px;
+    margin-right: 15px;
+    border-bottom: 3px solid #0000003d;
+}
+
+.certificateItem p{
+    font-size: 1.2rem;
+}
+
+.certificateItem:nth-child(2n){
+    flex-direction: row-reverse;
+}

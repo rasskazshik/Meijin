@@ -1,0 +1,18 @@
+.navigation{
+    background-color: #ffffffb3;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.navigation a{
+    text-decoration: none;
+    color: #383838;
+    padding: 10px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    border-bottom: 1px solid lightgray;
+}
+
+.navigation a:hover{
+    background-color: #9e9e9eb3
+}

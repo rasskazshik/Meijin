@@ -1,0 +1,20 @@
+.contentRow{
+    margin-right: 0;
+    margin-left: 0;
+    margin-top: 15px;
+}
+.content-left{
+    border-right: 1px solid grey;
+    
+}
+
+.content-right img{
+    max-width: 300px;
+    width: 100%;
+}
+
+.info{
+    display:block;
+    font-style: italic;
+    color: #575757;
+}

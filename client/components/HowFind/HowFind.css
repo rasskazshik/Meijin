@@ -1,0 +1,21 @@
+.howFind .map {
+    min-height: 300px;
+    border: 0;
+}
+
+.howFind{
+    border-bottom: 3px solid #0000003d;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.howFind .carousel-caption{
+    background-color: #80808099;
+    padding-bottom: 0;
+    padding-top: 0;
+    border-radius: 3px;
+}
+
+.activeList{
+    font-weight: bolder;
+}

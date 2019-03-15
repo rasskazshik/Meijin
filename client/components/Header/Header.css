@@ -1,0 +1,10 @@
+.header{
+    background-color: #e6f3ff99;
+    padding: 15px;
+    cursor: default;
+    margin-bottom: 5px;
+}
+
+.header p{
+    color: #575757;
+}
