@@ -2,7 +2,7 @@ import React,{Component} from 'react';
 import UploadCertificate from '../UploadCertificate/UploadCertificateController';
 import Header from '../Header/Header';
 
-export default class CartificatesView extends Component{
+export default class CertificatesView extends Component{
     constructor(props){
         super(props);
 
@@ -15,7 +15,7 @@ export default class CartificatesView extends Component{
             certificate=(<div className='text-center container'>Данные с сервера еще не получены</div>);
         }
         else{
-            if(this.props.certificates.lenght<1){
+            if(this.props.certificates.length<1){
                 certificate=(<div className='text-center container'>Сертификаты отсутствуют</div>);
             }
             else{
@@ -34,7 +34,8 @@ export default class CartificatesView extends Component{
         
         return(
             <div className="certificatesRow">
-                <Header title='Сертификаты' text='Ниже представлен список сертификатов, подтверждающих высокую квалификацию.'/>                
+                <Header title='Сертификаты' text='Ниже представлен список сертификатов, подтверждающих высокую квалификацию.'/> 
+                <UploadCertificate/>               
                 {certificate}
             </div>
         );

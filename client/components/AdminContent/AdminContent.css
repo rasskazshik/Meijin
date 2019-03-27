@@ -1,0 +1,13 @@
+.adminNavigation{
+    max-width: 350px;    
+    font-size: 1.3rem;
+}
+
+.adminNavigation p{
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+
+.adminNavigation p:hover{
+    font-weight: bolder;
+}

@@ -22,3 +22,5 @@ alexwine:bootstrap-4
 jquery
 cfs:gridfs
 cfs:standard-packages
+accounts-base
+accounts-password

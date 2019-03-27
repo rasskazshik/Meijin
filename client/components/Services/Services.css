@@ -1,0 +1,12 @@
+.servicesItemContainer{
+    border-bottom: solid black 1px;
+    padding: 10px;
+}
+
+.servicesItem{
+    cursor: pointer;
+}
+
+div[serviceid]{
+    display: none;
+}

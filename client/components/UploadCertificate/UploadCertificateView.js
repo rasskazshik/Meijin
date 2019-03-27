@@ -22,7 +22,7 @@ export default class UploadCertificateView extends Component{
                 <form onSubmit={this.SubmitFormCertificate}>
                     <textarea className="w-100" id="description" name="description" required placeholder="Описание загружаемого сертификата"/>
                     <input className="w-100" type="file" id="certificateImage" name="certificateImage" placeholder="Добавить сертификат"/>
-                    <input className="w-100" type="submit" defaultValue="Добавить сертификат"/>
+                    <input className="w-100" type="submit" value="Добавить сертификат"/>
                 </form>
             </div>
         );

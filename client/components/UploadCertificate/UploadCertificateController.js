@@ -28,7 +28,7 @@ export default class UploadCertificateController extends Component{
                     if (error){
                         console.log("Нашкобнулась запись в коллекцию: "+error);
                         //удаляем связанный файл
-                        Meteor.call("RemoveCertificate",fileObj._id,function(error) {
+                        Meteor.call("DeleteCertificateImageByImageId",fileObj._id,function(error) {
                             if (error){
                                 console.log("Нашкобнулось сервисное удаление файла: "+error);                                
                                 return false;

@@ -5,6 +5,8 @@ import Home from '../Home/Home';
 import Navigation from '../Navigation/Navigation';
 import HowFind from '../HowFind/HowFind';
 import Certificates from '../Certificates/CertificatesController';
+import Services from '../Services/Services';
+import AdminGate from '../AdminGate/AdminGateController';
 
 export default class App extends Component
 {
@@ -16,6 +18,8 @@ export default class App extends Component
                 <Route exact path='/' component={Home}/>
                 <Route exact path='/howFind' component={HowFind}/>
                 <Route exact path='/certificates' component={Certificates}/>
+                <Route exact path='/services' component={Services}/>
+                <Route exact path='/admin' component={AdminGate}/>
             </div>
         </div>
         );

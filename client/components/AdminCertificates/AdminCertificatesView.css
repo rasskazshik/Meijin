@@ -1,0 +1,14 @@
+.AdminCertificateItem{
+    margin-left: 15px;
+    margin-right: 15px;
+    border-bottom: 3px solid #0000003d;
+}
+
+.AdminCertificateItem p{
+    font-size: 1.2rem;
+}
+
+.certificateDescription{
+    min-height: 200px;
+    max-height: 350px;
+}
