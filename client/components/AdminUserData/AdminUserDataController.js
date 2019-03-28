@@ -22,14 +22,31 @@ export default class AdminUserDataController extends Component{
     }
 
     UpdateUserData(email,oldPassword,newPassword,callback){
-        Meteor.call('UpdateUserData',email,oldPassword,newPassword,function(err,responce){
-            if(err){
-                callback(err);
+        //меняем пароль
+        Accounts.changePassword(oldPassword, newPassword,function(error){
+            if(error){
+                callback(error);
             }
-            else{
-                callback(err,responce);
+            //в случае успеха меняем логин
+            else{                
+                Meteor.call('ChangeEmail',email,function(error){
+                    if(error){
+                        callback(error);
+                    }
+                    callback();
+                })   
             }
         });
+    
+
+        // Meteor.call('UpdateUserData',email,oldPassword,newPassword,function(err,responce){
+        //     if(err){
+        //         callback(err);
+        //     }
+        //     else{
+        //         callback(err,responce);
+        //     }
+        // });
     }
 
     render(){

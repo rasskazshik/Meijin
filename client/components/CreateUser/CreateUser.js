@@ -5,10 +5,12 @@ export default class CreateUser extends Component{
     constructor(props){
         super(props);
         this.SubmitCreateUser=this.SubmitCreateUser.bind(this);
-        this.CreateNewUser=this.CreateNewUser.bind(this);
     }
 
-    CreateNewUser(password, email){
+    SubmitCreateUser(event){
+        event.preventDefault();
+        let email = $(".email-tb").val();
+        let password = $(".password-tb").val();
         let componentPointer = this;
         Accounts.createUser({username:"Admin",password:password,email:email},function(err){
             if(err){
@@ -16,16 +18,10 @@ export default class CreateUser extends Component{
                 alert('Свяжитесь с разработчиком. Ошибка создания учетной записи администратора: '+err);
             }
             else{
+                console.log('Учетная запись создана');
                 componentPointer.props.UpdateAuthUserData();
             }
           });
-    }
-
-    SubmitCreateUser(event){
-        event.preventDefault();
-        let email = $(".email-tb").val();
-        let password = $(".password-tb").val();
-        this.CreateNewUser(password,email);
     }
 
     render(){
@@ -33,8 +29,8 @@ export default class CreateUser extends Component{
             <div>
                 <Header title='Создание новой учетной записи администратора'/>
                 <form className='container createUserForm' onSubmit={this.SubmitCreateUser}>
-                    <input type='email' className='email-tb w-100' required placeholder='Электронная почта'/>
-                    <input type='text' className='password-tb w-100' required placeholder='Пароль'/>
+                    <input type='email' className='email-tb w-100' required autoComplete='off' placeholder='Электронная почта'/>
+                    <input type='text' className='password-tb w-100' required autoComplete='off' placeholder='Пароль'/>
                     <input type='submit' className='w-100' value="Зарегистрировать администратора"/>
                 </form>
             </div>

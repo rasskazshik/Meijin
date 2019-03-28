@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
 //коллекция изображений сертификатов
 import {Account} from 'meteor/accounts-base';
 import CertificatesImagesCollection from '../lib/collections/certificates/certificatesImages';
@@ -144,20 +145,11 @@ Meteor.startup(() => {
     },
 
     //обновление данных пользователя
-    UpdateUserData:function(newEmail,oldPassword,newPassword){
-      //проверяем право выполнения
-      if(Meteor.userId()===null){
-        let responce={fail:"Попытка выполнения серверного метода в обход процедуры авторизации"};
-        return responce;
-      }
-      //проверяем корректность подтверждения данных
-      let user=Meteor.users.findOne({_id:Meteor.userId(),password:oldPassword});
-      if(user===null){
-        let responce={fail:"Старый пароль пользователя введен не верно"};
-        return responce;
-      }
-      //меняем пароль и почту
-      Meteor.users.update({_id:Meteor.userId()},{$set:{emails:[{address:newEmail,verified:false}],password:newPassword}});
+    ChangeEmail:function(newEmail){
+      let userId = Meteor.userId();
+      let user = Meteor.users.findOne({_id:userId});
+      Accounts.removeEmail(userId, user.emails[0].address);
+      Accounts.addEmail(userId, newEmail);
     }
   });
 });

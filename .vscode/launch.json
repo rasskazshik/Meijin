@@ -17,7 +17,7 @@
             "runtimeArgs": ["run", "debug"],
             "outputCapture": "std",
             "port": 9229,
-            "timeout": 90000
+            "timeout": 900000
         }
     ],
     "compounds": [
