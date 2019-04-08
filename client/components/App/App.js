@@ -7,6 +7,7 @@ import HowFind from '../HowFind/HowFind';
 import Certificates from '../Certificates/CertificatesController';
 import Services from '../Services/Services';
 import AdminGate from '../AdminGate/AdminGateController';
+import Footer from '../Footer/Footer';
 
 export default class App extends Component
 {
@@ -21,6 +22,7 @@ export default class App extends Component
                 <Route exact path='/services' component={Services}/>
                 <Route exact path='/admin' component={AdminGate}/>
             </div>
+            <Footer/>
         </div>
         );
     }

@@ -14,5 +14,29 @@
 }
 
 .navigation a:hover{
-    background-color: #9e9e9eb3
+    background-color: #bddffd99;
+}
+
+.navigation-drop{
+    background-color: #f7efe5;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.navigation-drop a{
+    text-decoration: none;
+    color: #383838;
+    padding: 10px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    border-bottom: 1px solid lightgray;
+}
+
+.navigation-drop a:hover{
+    background-color: #bddffd99;
+}
+
+.navigationButton{
+    background-color: #ffffffb3;
+    font-size:1.5rem;
 }

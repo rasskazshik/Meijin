@@ -8,25 +8,62 @@ export default class AdminCertificatesView extends Component{
 
         this.DeleteCertificate=this.DeleteCertificate.bind(this);
         this.UpdateCertificate=this.UpdateCertificate.bind(this);
+        this.ClearValidity=this.ClearValidity.bind(this);
+        this.CertificateUp=this.CertificateUp.bind(this);
+        this.CertificateDown=this.CertificateDown.bind(this);
     }
 
     //передача данных для удаления сертификакта в контроллер
     DeleteCertificate(event){
         if(confirm("Вы уверены в том, что хотите удалить подтверждение квалификации?")){
             let certificateId = $(event.target).attr("certificateid");
-            this.props.DeleteCertificate(certificateId);
+            this.props.DeleteCertificate(certificateId,function(error){
+                if(error){
+                    alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                }
+            });
         }
     }
 
+    //передача данных в контроллер для обновления сертификата
     UpdateCertificate(event){
-        if(confirm("Вы уверены в том, что хотите обновить данные документа подтверждения квалификации?")){
-            let certificateId = $(event.target).attr("certificateid");
-            let certificateDescription = $('.certificateDescription[certificateid="'+certificateId+'"]').val();
-            let selector = '.sertificateImage[certificateid="'+certificateId+'"]';
-            let file = document.querySelector('.sertificateImage[certificateid="'+certificateId+'"]');
-            let certificateImageFiles = document.querySelector('.sertificateImage[certificateid="'+certificateId+'"]').files;
-            this.props.UpdateCertificate(certificateId,certificateDescription,certificateImageFiles);
+        let certificateId = $(event.target).attr("certificateid");
+        //валидация
+        //странное поведение в хроме - не всплывает подсказка если валидация внутри условия с конфирм
+        if(document.querySelector('form[certificateid="'+certificateId+'"]').reportValidity()){      
+            if(confirm("Вы уверены в том, что хотите обновить данные документа подтверждения квалификации?")){
+                let certificateDescription = document.querySelector('textarea[certificateid="'+certificateId+'"]').value;
+                let certificateImageFiles = document.querySelector('input[type="file"][certificateid="'+certificateId+'"]').files;
+                this.props.UpdateCertificate(certificateId,certificateDescription,certificateImageFiles,function(error){
+                    if(error){
+                        alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                    }
+                });
+            }  
         }
+    }
+
+    //снимаем флаг ошибки при изменении данных инпута
+    ClearValidity(event){
+        event.target.setCustomValidity('');
+    }
+
+    CertificateUp(){
+        let certificateId = $(event.target).attr("certificateid");
+        this.props.CertificateUp(certificateId,function(error){
+            if(error){
+                alert('Во время выполнения операции возникли ошибки. ('+error+')');
+            }
+        });
+    }
+
+    CertificateDown(){
+        let certificateId = $(event.target).attr("certificateid");
+        this.props.CertificateDown(certificateId,function(error){
+            if(error){
+                alert('Во время выполнения операции возникли ошибки. ('+error+')');
+            }
+        });
     }
 
     render(){
@@ -41,16 +78,28 @@ export default class AdminCertificatesView extends Component{
             }
             else{
                 certificate = this.props.certificates.map((certificate) =>
-                <div className='row mt-1 mb-2 pb-2 AdminCertificateItem align-items-center' key={certificate._id}>                    
+                <div className='row mt-1 mb-2 pb-2 AdminCertificateItem align-items-center' key={certificate._id}>                
                     <div className='col-md-6'>
                         <img className="w-100 img-thumbnail"  src={certificate.imagesURL} alt={certificate.imagesURL}/>
-                        <input type='file' certificateid={certificate._id} className='sertificateImage'/>
+                        Изображение (если не выбрать - останется неизменным): 
+                        <input type='file' certificateid={certificate._id} className='sertificateImage mb-1'/>
                     </div>
-                    <div className='col-md-6'>
-                        <textarea className='w-100 certificateDescription' certificateid={certificate._id} defaultValue={certificate.description}/>
+                    <div className='col-md-6'>                        
+                        Описание документа:
+                        <form certificateid={certificate._id}>
+                            <textarea className='w-100 certificateDescription' onChange={this.ClearValidity} certificateid={certificate._id} autoComplete='off' required placeholder="Описание загружаемого сертификата" defaultValue={certificate.description}/>
+                        </form>                       
                     </div>
                     <input className='w-100' type='button' certificateid={certificate._id} value='Удалить подтверждение квалификации' onClick={this.DeleteCertificate}/>
                     <input className='w-100' type='button' certificateid={certificate._id} value='Обновить данные документа квалификации' onClick={this.UpdateCertificate}/>
+                    <div className='row w-100 positionButtonRow'>
+                        <div className='col-md'>
+                            <input type='button' className='w-100' certificateid={certificate._id} onClick={this.CertificateUp} value='Поднять в списке'/>
+                        </div>
+                        <div className='col-md'>
+                            <input type='button' className='w-100' certificateid={certificate._id} onClick={this.CertificateDown} value='Опустить в списке'/>
+                        </div>
+                    </div>
                 </div>
                 );
             }
@@ -58,7 +107,7 @@ export default class AdminCertificatesView extends Component{
         
         return(
             <div className="certificatesRow">
-                <Header title='Сертификаты' text='Ниже представлен список сертификатов, подтверждающих высокую квалификацию.'/> 
+                <Header title='Администрирование документов подтверждающих квалификацию' text='В этом меню можно добавить, удалить и изменить информацию подтверждающую квалификацию'/> 
                 <UploadCertificate/>               
                 {certificate}
             </div>

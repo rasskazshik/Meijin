@@ -10,6 +10,8 @@ class AdminServicesController extends Component{
 
         this.DeleteService=this.DeleteService.bind(this);
         this.UpdateService=this.UpdateService.bind(this);
+        this.ServiceUp=this.ServiceUp.bind(this);
+        this.ServiceDown=this.ServiceDown.bind(this);
     }
 
     //удаление услуги и связанных с ней изображений
@@ -17,7 +19,7 @@ class AdminServicesController extends Component{
         Meteor.call('DeleteService',serviceId);
     }
 
-    UpdateService(serviceId,title, description, price, images){
+    UpdateService(serviceId,title, description, price, images,callback){
         //формируем массив путей изображений связанных с услугой
         //в случае отсутствия новых - передаем пустой, серверный метод разберется сам что с ним делать
         let serviceImages = [];       
@@ -26,61 +28,101 @@ class AdminServicesController extends Component{
             //чистим старые изображения
             //для полной уверенности в очистке связанной коллекции до изменения данных
             //запуск обновления осуществляю в обратном вызове
-            Meteor.call("RemoveServiceImages",serviceId,function(){
-                //запись в коллекцию асинхронна, поэтому у меня не успевал формироваться список путей к изображениям до записи
-                //чтобы пофиксить - наркоманим с циклом и функцией обратного вызова
-                //перебираем все файлы            
-                for(let i=0;i<images.length;i++) {
-                    //доступ к файлу на стороне клиента (при таком подходе не могу сделать это в серверном методе)
-                    //осуществляем запись в коллекцию файлов
-                    servicesImagesCollection.insert(images[i], function (err, fileObj) {
-                        if (err){
-                            console.log("Нашкобнулась загрузка файла: "+error);
-                        } 
-                        else {
-                            //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
-                            let imageItem = {};
-                            imageItem.imageURL = '/cfs/files/servicesImages/' + fileObj._id;
-                            imageItem.imageId = fileObj._id;;
-                            //добавляем в массив путей
-                            serviceImages.push(imageItem); 
-                            //если обработали последний файл 
-                            if(i===images.length-1){
-                                //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-                                Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(err,responce){
-                                    if(err){
-                                        //удаляем связанные файлы
-                                        serviceImages.forEach(function(item) {
-                                            Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
-                                                if (error){
-                                                    console.log("Нашкобнулось сервисное удаление файла: "+error);
-                                                }
-                                            });
-                                        });
-                                    }
+            Meteor.call("RemoveServiceImages",serviceId,function(error){
+                if(error){
+                    callback(error);
+                }
+                else{
+                    //запись в коллекцию асинхронна, поэтому у меня не успевал формироваться список путей к изображениям до записи
+                    //чтобы пофиксить - наркоманим с циклом и функцией обратного вызова
+                    //перебираем все файлы            
+                    for(let i=0;i<images.length;i++) {
+                        //доступ к файлу на стороне клиента (при таком подходе не могу сделать это в серверном методе)
+                        //осуществляем запись в коллекцию файлов
+                        servicesImagesCollection.insert(images[i], function (error, fileObj) {
+                            if (error){
+                                //удаляем уже загруженные файлы
+                                serviceImages.forEach(function(item) {
+                                    Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
+                                        if (error){
+                                            callback(error);
+                                        }
+                                    });
                                 });
-                            }            
-                        }
-                    });
-                };
+                                callback(error);
+                            } 
+                            else {
+                                //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
+                                let imageItem = {};
+                                imageItem.imageURL = '/cfs/files/servicesImages/' + fileObj._id;
+                                imageItem.imageId = fileObj._id;;
+                                //добавляем в массив путей
+                                serviceImages.push(imageItem); 
+                                //если обработали последний файл 
+                                if(i===images.length-1){
+                                    //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
+                                    Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error,responce){
+                                        if(err){
+                                            //удаляем связанные файлы
+                                            serviceImages.forEach(function(item) {
+                                                Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
+                                                    if (error){
+                                                        callback(error);
+                                                    }
+                                                });
+                                            });
+                                            callback(error);
+                                        }
+                                        else{
+                                            callback();
+                                        }
+                                    });
+                                }            
+                            }
+                        });
+                    };
+                }
             });
         }
         else{
             //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-            Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(err,responce){
-                if(err){
-                    return false;
+            Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error,responce){
+                if(error){
+                    callback(error);
                 }
                 else{
-                    return responce;
+                    callback();
                 }
             });
         }
 
     }
 
+    
+    ServiceUp(serviceId,callback){
+        Meteor.call('ServiceUp',serviceId,function(error){
+            if (error){
+                callback(error);
+            } 
+            else {
+                callback();
+            }
+        });
+    }
+
+    ServiceDown(serviceId,callback){
+        Meteor.call('ServiceDown',serviceId,function(error){
+            if (error){
+                callback(error);
+            } 
+            else {
+                callback();
+            }
+        });
+    }
+
     render(){
-        return(<AdminServicesView services={this.props.services} DeleteService={this.DeleteService} UpdateService={this.UpdateService}/>);
+        return(<AdminServicesView services={this.props.services} DeleteService={this.DeleteService} UpdateService={this.UpdateService} ServiceUp={this.ServiceUp} ServiceDown={this.ServiceDown}/>);
     }
 }
 
@@ -88,6 +130,6 @@ class AdminServicesController extends Component{
 export default withTracker((props) => {
     Meteor.subscribe('services');
     return {
-        services: servicesCollection.find({},{images:0}).fetch()
+        services: servicesCollection.find({},{sort:{position: -1}}).fetch()
     };
 })(AdminServicesController);

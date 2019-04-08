@@ -14,9 +14,23 @@ export default class UploadServicesController extends Component{
     //serviceDescription - текст описания услуги
     //servicePrice - текст примерной стоимости услуги    
     //files - объект input file (массив файлов)
-    InsertService(serviceTitle, serviceDescription, servicePrice, files){
+    InsertService(serviceTitle, serviceDescription, servicePrice, files, callback){
         //массив путей изображений связанных с услугой
         let serviceImages = [];
+        //если изображений к услуге не имеется
+        if(files.length<1){
+            //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
+            Meteor.call("InsertService",serviceTitle, serviceDescription, servicePrice, serviceImages,function(error) {
+                if (error){
+                    console.log("Нашкобнулась запись в коллекцию: "+error);
+                    callback(error);
+                }
+                else {
+                    console.log("Данные успешно добавлены в коллекции");
+                    callback();
+                }              
+            });
+        }
       
         //запись в коллекцию асинхронна, поэтому у меня не успевал формироваться список путей к изображениям до записи
         //чтобы пофиксить - наркоманим с циклом (счетчиком изображений) и функцией обратного вызова
@@ -24,9 +38,19 @@ export default class UploadServicesController extends Component{
         for(let i=0;i<files.length;i++) {
             //доступ к файлу на стороне клиента (при таком подходе не могу сделать это в серверном методе)
             //осуществляем запись в коллекцию файлов
-            servicesImagesCollection.insert(files[i], function (err, fileObj) {
-                if (err){
+            servicesImagesCollection.insert(files[i], function (error, fileObj) {
+                if (error){
                     console.log("Нашкобнулась загрузка файла: "+error);
+                    //удаляем уже загруженные файлы
+                    serviceImages.forEach(function(item) {
+                        Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
+                            if (error){
+                                console.log("Нашкобнулось сервисное удаление файла: "+error);
+                                callback(error);
+                            }
+                        });
+                    });
+                    callback(error);
                 } 
                 else {
                     //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
@@ -37,7 +61,7 @@ export default class UploadServicesController extends Component{
                     serviceImages.push(imageItem);  
                     if(i===files.length-1)  {
                         //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-                        Meteor.call("InsertService",serviceTitle, serviceDescription, servicePrice, serviceImages,function(error,responce) {
+                        Meteor.call("InsertService",serviceTitle, serviceDescription, servicePrice, serviceImages,function(error) {
                             if (error){
                                 console.log("Нашкобнулась запись в коллекцию: "+error);
                                 //удаляем связанные файлы
@@ -45,12 +69,15 @@ export default class UploadServicesController extends Component{
                                     Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
                                         if (error){
                                             console.log("Нашкобнулось сервисное удаление файла: "+error);
+                                            callback(error);
                                         }
                                     });
                                 });
+                                callback(error);
                             }
                             else {
                                 console.log("Данные успешно добавлены в коллекции");
+                                callback();
                             }              
                         });
                     }            

@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import UploadCertificate from '../UploadCertificate/UploadCertificateController';
 import Header from '../Header/Header';
 
 export default class CertificatesView extends Component{
@@ -34,8 +33,7 @@ export default class CertificatesView extends Component{
         
         return(
             <div className="certificatesRow">
-                <Header title='Сертификаты' text='Ниже представлен список сертификатов, подтверждающих высокую квалификацию.'/> 
-                <UploadCertificate/>               
+                <Header title='Сертификаты' text='Ниже представлен список сертификатов, подтверждающих высокую квалификацию.'/>              
                 {certificate}
             </div>
         );

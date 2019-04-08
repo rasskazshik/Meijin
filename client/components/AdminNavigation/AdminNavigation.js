@@ -24,9 +24,9 @@ export default class AdminNavigation extends Component{
         return(
             <div className='adminContentList'>
                 <p content='logout'>Выход из учетной записи</p>
-                <p content='services'>Администрирование услуг</p>
-                <p content='certificates'>Администрирование квалификиции</p>
-                <p content='userData'>Учетные данные администратора</p>
+                <p className={this.props.contentType=='services'?'activeAdminNavigation':''} content='services'>Администрирование услуг</p>
+                <p className={this.props.contentType=='certificates'?'activeAdminNavigation':''} content='certificates'>Администрирование квалификиции</p>
+                <p className={this.props.contentType=='userData'?'activeAdminNavigation':''} content='userData'>Учетные данные администратора</p>
             </div>
         );
     }

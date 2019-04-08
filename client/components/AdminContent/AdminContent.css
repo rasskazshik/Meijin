@@ -11,3 +11,11 @@
 .adminNavigation p:hover{
     font-weight: bolder;
 }
+
+@media (max-width: 720px) {
+    /*убираем отступ у row на малых устройствах (пустое пространство справа)*/
+    .adminContentRow{
+        margin-right: 0;
+        margin-left: 0;
+    }
+}

@@ -37,10 +37,10 @@ export default class Authorization extends Component{
     render(){
         return(
             <div>
-                <Header title='Авторизация пользователя'/>
+                <Header title='Авторизация администратора'/>
                 <form className='container authorizationForm' onSubmit={this.SubmitAuthorization}>
                     <input type='email' className='email-tb w-100' required placeholder='Электронная почта'/>
-                    <input type='text' className='password-tb w-100' required placeholder='Пароль'/>
+                    <input type='password' className='password-tb w-100' required placeholder='Пароль'/>
                     <input type='submit' className='w-100' value="Авторизация"/>
                 </form>
             </div>

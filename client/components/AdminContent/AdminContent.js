@@ -34,12 +34,12 @@ export default class AdminContent extends Component{
         return(
             <div>
                 <Header title='Меню администратора'/>
-                <div className='row'>
-                    <div className='col-md'>
+                <div className='row adminContentRow'>
+                    <div className='col-md order-2 order-md-1'>
                         {content}
                     </div>
-                    <div className='col-md adminNavigation'>
-                        <AdminNavigation Logout={this.props.Logout} SetContentType={this.SetContentType}/>
+                    <div className='col-md adminNavigation order-1 order-md-2'>
+                        <AdminNavigation contentType={this.state.contentType} Logout={this.props.Logout} SetContentType={this.SetContentType}/>
                     </div>
                 </div>
             </div>

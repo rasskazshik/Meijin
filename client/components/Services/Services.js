@@ -3,7 +3,6 @@ import { withTracker } from 'meteor/react-meteor-data';
 import Header from '../Header/Header';
 import servicesCollection from '../../../lib/collections/services/services';
 import ServiceSlider from '../ServiceSlider/ServiceSliderController';
-import UploadService from '../UploadService/UploadServiceController';
 
 class Services extends Component{
     constructor(props){
@@ -41,7 +40,6 @@ class Services extends Component{
         return(
             <div>
                 <Header title='Виды оказываемых услуг' text='Ниже приведен список оказываемых услуг и их примерные цены.'/>
-                <UploadService/>
                 <div className='servicesContainer'>
                     {servicesItems}
                 </div>
@@ -54,6 +52,6 @@ class Services extends Component{
 export default withTracker((props) => {
     Meteor.subscribe('services');
     return {
-        services: servicesCollection.find({},{images:0}).fetch()
+        services: servicesCollection.find({},{sort:{position: -1}}).fetch()
     };
 })(Services);

@@ -9,6 +9,9 @@ export default class AdminServicesView extends Component{
 
         this.DeleteService=this.DeleteService.bind(this);
         this.UpdateService=this.UpdateService.bind(this);
+        this.ClearValidity=this.ClearValidity.bind(this);
+        this.ServiceUp=this.ServiceUp.bind(this);
+        this.ServiceDown=this.ServiceDown.bind(this);
     }
 
     componentDidMount(){
@@ -28,14 +31,69 @@ export default class AdminServicesView extends Component{
 
     //передача данных для обновления в метод контроллера
     UpdateService(event){
-        if(confirm('Вы уверены в том, что хотите обновить информацию об услуге?')){
-            let serviceId = $(event.target).attr('serviceid');
-            let title = $(".servicesItemContainer[serviceid='"+serviceId+"'] .title").val();
-            let description = $(".servicesItemContainer[serviceid='"+serviceId+"'] .description").val();
-            let price = $(".servicesItemContainer[serviceid='"+serviceId+"'] .price").val();
-            let images = document.querySelector(".servicesItemContainer[serviceid='"+serviceId+"'] .file").files;
-            this.props.UpdateService(serviceId,title, description, price, images);
+        event.preventDefault();
+        let serviceId = $(event.target).attr('serviceid');
+        let title = $(".updateServiceForm[serviceid='"+serviceId+"'] .title").val();
+        let description = $(".updateServiceForm[serviceid='"+serviceId+"'] .description").val();
+        let price = $(".updateServiceForm[serviceid='"+serviceId+"'] .price").val();
+        let images = document.querySelector(".updateServiceForm[serviceid='"+serviceId+"'] .file").files;
+        //не недооценивай мощь юзверей
+        //проверяем что юзверь вопреки предлагаемому фильтру не загрузил файл не изображения
+        Array.from(images).forEach(function(file){
+            //чекаем все mime типы для .jpeg, .jpg, .png, .gif 
+            switch(file.type){
+                case 'image/jpeg':
+                    break;
+                case 'image/x-citrix-jpeg':
+                    break;
+                case 'image/png':
+                    break;
+                case 'image/x-citrix-png':
+                    break;
+                case 'image/x-png':
+                    break;
+                case 'image/gif':
+                    break;
+                default:
+                    document.querySelector(".updateServiceForm[serviceid='"+serviceId+"'] .file").setCustomValidity('Вопреки предложенному фильтру вы выбрали для загрузки не корректный тип файла...');
+                    break;
+            }
+        })
+        //проверяем форму на валидность после проверки типов файлов
+        if(event.target.reportValidity()){
+            if(confirm('Вы уверены в том, что хотите обновить информацию об услуге?')){
+                this.props.UpdateService(serviceId,title, description, price, images,function(error){
+                    if(error){
+                        alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                    }
+                });
+            }
         }
+    }
+
+    //снимаем флаг ошибки при изменении данных инпута
+    ClearValidity(event){
+        event.target.setCustomValidity('');
+    }
+
+    //передача данных в контроллер для поднятия в списке
+    ServiceUp(){
+        let serviceId = $(event.target).attr("serviceid");
+        this.props.ServiceUp(serviceId,function(error){
+            if(error){
+                alert('Во время выполнения операции возникли ошибки. ('+error+')');
+            }
+        });
+    }
+
+    //передача данных в контроллер для поднятия в списке
+    ServiceDown(){
+        let serviceId = $(event.target).attr("serviceid");
+        this.props.ServiceDown(serviceId,function(error){
+            if(error){
+                alert('Во время выполнения операции возникли ошибки. ('+error+')');
+            }
+        });
     }
 
     render(){
@@ -45,36 +103,46 @@ export default class AdminServicesView extends Component{
         }
         else{
             servicesItems=this.props.services.map((item)=>
-                <div key={item._id}>
-                    <h4 className='servicesItem' serviceid={item._id}>{item.title}</h4>                    
-                    <div className='servicesItemContainer' serviceid={item._id}>
-                        <input type='button' className='w-100' serviceid={item._id} onClick={this.DeleteService} value='Удалить услугу'/>
-                        <input type='button' className='w-100' serviceid={item._id} onClick={this.UpdateService} value='Обновить текст и изображение'/>  
-                        <p>
-                            Наименование: 
-                            <input type='text' className='w-100 title' defaultValue={item.title}/>
-                        </p>                       
-                        <p>
-                            Описание: 
-                            <textarea className='w-100 description' defaultValue={item.description}/>
-                        </p>
-                        <p>
-                            Ориентировочная стоимость: 
-                            <input type='text' className='w-100 price' defaultValue={item.price}/>
-                        </p>
-                        <p>
-                            Изображение (если не выбрать - останется неизменным): 
-                            <input type='file' className='w-100 file'/>
-                        </p>
-                        <ServiceSlider serviceId={item._id}/>
-                    </div>                    
+                <div className='servicesItemContainer' key={item._id}>
+                    <form className='updateServiceForm' serviceid={item._id} onSubmit={this.UpdateService}>
+                        <h4 className='servicesItem' serviceid={item._id}>{item.title}</h4>                    
+                        <div serviceid={item._id}>
+                            <p>
+                                Наименование: 
+                                <input type='text' className='w-100 title' defaultValue={item.title} required autoComplete='off'/>
+                            </p>                       
+                            <p>
+                                Описание: 
+                                <textarea className='w-100 description' defaultValue={item.description} required autoComplete='off'/>
+                            </p>
+                            <p>
+                                Ориентировочная стоимость: 
+                                <input type='text' className='w-100 price' defaultValue={item.price} required autoComplete='off'/>
+                            </p>
+                            <p>
+                                Изображение (если не выбрать - останется неизменным): 
+                                <input type='file' multiple onChange={this.ClearValidity} accept=".jpg,.jpeg,.png,.bmp,.gif" className='w-100 file'/>
+                            </p>
+                            <ServiceSlider serviceId={item._id}/>
+                            <input type='button' className='w-100' serviceid={item._id} onClick={this.DeleteService} value='Удалить услугу'/>
+                            <input type='submit' className='w-100' serviceid={item._id} value='Обновить текст и изображение'/>
+                            <div className='row w-100 positionButtonRow'>
+                                <div className='col-md'>
+                                    <input type='button' className='w-100' serviceid={item._id} onClick={this.ServiceUp} value='Поднять в списке'/>
+                                </div>
+                                <div className='col-md'>
+                                    <input type='button' className='w-100' serviceid={item._id} onClick={this.ServiceDown} value='Опустить в списке'/>
+                                </div>
+                            </div>  
+                        </div>      
+                    </form>              
                 </div>
             );
         }
 
         return(
             <div>
-                <Header title='Виды оказываемых услуг' text='Ниже приведен список оказываемых услуг и их примерные цены.'/>
+                <Header title='Администрирование оказываемых услуг' text='В этом меню можно добавить, удалить и изменить оказываемые услуги и информацию о них'/>
                 <UploadService/>
                 <div className='servicesContainer'>
                     {servicesItems}

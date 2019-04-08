@@ -2,7 +2,7 @@
     background-color: #e6f3ff99;
     padding: 15px;
     cursor: default;
-    margin-bottom: 5px;
+    border-bottom: 1px solid #00000047;
 }
 
 .header p{

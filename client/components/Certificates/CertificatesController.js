@@ -17,6 +17,6 @@ class CertificatesController extends Component{
 export default withTracker((props) => {
     Meteor.subscribe('certificates');
     return {
-        certificates: CertificatesCollection.find({}).fetch()
+        certificates: CertificatesCollection.find({},{sort:{position: -1}}).fetch()
     };
 })(CertificatesController);
