@@ -6,6 +6,8 @@ export default class UploadServiceView extends Component{
 
         this.SubmitFormService=this.SubmitFormService.bind(this);
         this.ClearValidity=this.ClearValidity.bind(this);
+        this.FormEnable=this.FormEnable.bind(this);
+        this.FormDisable=this.FormDisable.bind(this);
     }
 
     //поднятие данных в контроллер
@@ -18,6 +20,8 @@ export default class UploadServiceView extends Component{
         let files = document.getElementById("images").files;
         //для обработки данных синтетического события выковыриваем их
         let eventForm = event.target;
+        //указатель на компонент для вложенных функций
+        let componentPointer = this;
         //заплатка required для огнелиса-параноика (required textarea сразу срабатывает при загрузке страницы)
         if(textarea.value===''){
             textarea.setCustomValidity('Это поле должно быть заполнено');
@@ -46,14 +50,20 @@ export default class UploadServiceView extends Component{
         })
         //проверяем форму на валидность после проверки типов файлов
         if(event.target.reportValidity()){
+            //блокируем компонент на период обработки запроса
+            componentPointer.FormDisable(eventForm);
             //передаем в контроллер для загрузки и добавления
             this.props.InsertService(title, description, price, files,function(error){
                 if(error){
                     alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                    //разблокировка формы на период обработки запроса
+                    componentPointer.FormEnable(eventForm);
                 }
                 else{
                     //сбрасываем форму
                     eventForm.reset();
+                    //разблокировка формы на период обработки запроса
+                    componentPointer.FormEnable(eventForm);
                 }
             });
         }
@@ -62,6 +72,22 @@ export default class UploadServiceView extends Component{
     //снимаем флаг ошибки при изменении данных инпута
     ClearValidity(event){
         event.target.setCustomValidity('');
+    }
+
+    //блокировка формы
+    FormDisable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", true );
+        });
+        $(".uploadService h4").html('Обработка запроса...');
+    }
+
+    //разблокировка формы
+    FormEnable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", false );
+        });
+        $(".uploadService h4").html('Форма добавления новой услуги');
     }
 
     render(){

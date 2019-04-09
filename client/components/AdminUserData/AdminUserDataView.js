@@ -8,6 +8,8 @@ export default class AdminUserDataView extends Component{
         this.SubmitUpdateUserData=this.SubmitUpdateUserData.bind(this);
         this.ClearValidity=this.ClearValidity.bind(this);
         this.ClearPasswordsFields=this.ClearPasswordsFields.bind(this);
+        this.FormDisable=this.FormDisable.bind(this);
+        this.FormEnable=this.FormEnable.bind(this);
     }
 
     //пересылка данных в контроллер для изменения учетных данных
@@ -24,6 +26,8 @@ export default class AdminUserDataView extends Component{
         let repeatPassword = $('.updateUserDataForm .repeatPassword').val();
         //если повтор пароля верен
         if(newPassword===repeatPassword){
+            //отключаем форму на время выполнения запроса
+            componentPointer.FormDisable(eventForm);
             this.props.UpdateUserData(email,oldPassword,newPassword,function(userCheckError){
                 if(userCheckError){
                     switch(userCheckError.error){
@@ -31,15 +35,21 @@ export default class AdminUserDataView extends Component{
                             //сообщаем об ошибке
                             let invalidInput = document.querySelector('.updateUserDataForm .oldPassword');
                             invalidInput.setCustomValidity('Старый пароль введен не верно');
+                            //включаем форму
+                            componentPointer.FormEnable(eventForm);
                             eventForm.reportValidity();
                             break;
                         default:
                             alert("Во время выполнения операции возникли ошибки. ("+userCheckError.message+")");
+                            //включаем форму
+                            componentPointer.FormEnable(eventForm);
                             break;
                     }                        
                 }
                 else{
                     alert("Данные успешно изменены");
+                    //включаем форму
+                    componentPointer.FormEnable(eventForm);
                     componentPointer.ClearPasswordsFields();
                 }
             });
@@ -64,6 +74,20 @@ export default class AdminUserDataView extends Component{
         $('.updateUserDataForm .email').val(email);
     }
     
+    //отключение формы
+    FormDisable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", true );
+        });
+    }
+
+    //включение формы
+    FormEnable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", false );
+        });
+    }
+
     render(){
         return(
             <div>

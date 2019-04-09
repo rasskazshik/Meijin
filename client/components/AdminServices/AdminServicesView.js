@@ -11,7 +11,10 @@ export default class AdminServicesView extends Component{
         this.UpdateService=this.UpdateService.bind(this);
         this.ClearValidity=this.ClearValidity.bind(this);
         this.ServiceUp=this.ServiceUp.bind(this);
-        this.ServiceDown=this.ServiceDown.bind(this);
+        this.ServiceDown=this.ServiceDown.bind(this);        
+        this.FormEnable=this.FormEnable.bind(this);
+        this.FormDisable=this.FormDisable.bind(this);
+        this.ClearFileUpdate=this.ClearFileUpdate.bind(this);
     }
 
     componentDidMount(){
@@ -33,6 +36,8 @@ export default class AdminServicesView extends Component{
     UpdateService(event){
         event.preventDefault();
         let serviceId = $(event.target).attr('serviceid');
+        let componentPointer = this;
+        let targetForm = event.target;
         let title = $(".updateServiceForm[serviceid='"+serviceId+"'] .title").val();
         let description = $(".updateServiceForm[serviceid='"+serviceId+"'] .description").val();
         let price = $(".updateServiceForm[serviceid='"+serviceId+"'] .price").val();
@@ -62,9 +67,18 @@ export default class AdminServicesView extends Component{
         //проверяем форму на валидность после проверки типов файлов
         if(event.target.reportValidity()){
             if(confirm('Вы уверены в том, что хотите обновить информацию об услуге?')){
+                //блокируем объект на время выполнения запроса
+                componentPointer.FormDisable(targetForm,serviceId);
                 this.props.UpdateService(serviceId,title, description, price, images,function(error){
                     if(error){
                         alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                        //разблокировка объекта по завершению обработки запроса
+                        componentPointer.FormEnable(targetForm,serviceId);
+                    }
+                    else{
+                        //разблокировка объекта по завершению обработки запроса
+                        componentPointer.FormEnable(targetForm,serviceId);
+                        componentPointer.ClearFileUpdate(serviceId);
                     }
                 });
             }
@@ -96,6 +110,27 @@ export default class AdminServicesView extends Component{
         });
     }
 
+    //блокировка формы
+    FormDisable(form, serviceId){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", true );
+        });
+        $("form[serviceid='"+serviceId+"'] h4").html('Идет обработка запроса');
+    }
+
+    //разблокировка формы
+    FormEnable(form, serviceId){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", false );
+        });
+        $("form[serviceid='"+serviceId+"'] h4").html('');
+    }
+
+    //чистим инпут файл
+    ClearFileUpdate(serviceId){
+        $("form[serviceid='"+serviceId+"'] .file").val('');
+    }
+
     render(){
         let servicesItems;
         if(this.props.services.length<1){
@@ -103,8 +138,9 @@ export default class AdminServicesView extends Component{
         }
         else{
             servicesItems=this.props.services.map((item)=>
-                <div className='servicesItemContainer' key={item._id}>
+                <div className='servicesItemContainer' key={item._id}>                    
                     <form className='updateServiceForm' serviceid={item._id} onSubmit={this.UpdateService}>
+                        <h4 className='w-100 text-center'></h4>
                         <h4 className='servicesItem' serviceid={item._id}>{item.title}</h4>                    
                         <div serviceid={item._id}>
                             <p>

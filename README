@@ -1,0 +1,36 @@
+Meijin
+Meijin is Meteor application designed to help a massage master search for clients.
+The administrative page allows the user to independently upload photos of certificates to confirm qualifications, independently form a list of services with a description of service and display services photos.
+
+Installation
+To install application (VPS Ubuntu sample):
+1 - install Node.js and npm on the server 
+    apt update
+    apt install nodejs npm
+2 - install MongoDB on the server
+    apt install mongodb-server
+3 - build application
+    meteor build ../buildFolder --architecture os.linux.x86_64
+4 - upload .tar.gz to the server via ssh
+    scp Meijin.tar.gz user@host:/home/meteor
+5 - unpack .ter.gz file
+    tar -xf meteor.tar.gz
+6 - cd to folder unpacked application and install it
+    cd programs/server && npm install
+7 - set environment variables 
+    PORT='80'
+    MONGO_URL='mongodb://localhost:27017/meteor'
+    ROOT_URL='http://example.com'
+    MAIL_URL='smtp://user:password@mailhost:port'
+8 - cd to folder unpacked application and start it 
+    node main.js
+8.1 - to automatic start application on start server install pm2
+    npm install pm2 -g
+8.2 - start application like daemon (pm2 process)
+    pm2 start main.js
+8.3 - enable startup processes 
+    pm2 startup
+8.4 - save current process list
+    pm2 save
+8.5 - reboot system
+    shutdown -r now

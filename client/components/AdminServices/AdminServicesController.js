@@ -62,7 +62,7 @@ class AdminServicesController extends Component{
                                 if(i===images.length-1){
                                     //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
                                     Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error,responce){
-                                        if(err){
+                                        if(error){
                                             //удаляем связанные файлы
                                             serviceImages.forEach(function(item) {
                                                 Meteor.call("RemoveServiceImage",item["imageId"],function(error) {

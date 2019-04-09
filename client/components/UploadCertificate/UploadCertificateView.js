@@ -6,6 +6,8 @@ export default class UploadCertificateView extends Component{
 
         this.SubmitFormCertificate=this.SubmitFormCertificate.bind(this);
         this.ClearValidity=this.ClearValidity.bind(this);
+        this.FormEnable=this.FormEnable.bind(this);
+        this.FormDisable=this.FormDisable.bind(this);
     }
 
     //поднятие данных в контроллер
@@ -14,8 +16,10 @@ export default class UploadCertificateView extends Component{
         let file = document.getElementById('certificateImage').files[0];
         let textarea=document.getElementById('certificateDescription');
         let certificateDescription = textarea.value;
-        //для обработки данных синтетического события выковыриваем их
+        //для обработки данных синтетического события во вложенной функци - выковыриваем их (данные)
         let eventForm = event.target;
+        //указатель на компонент для вложенного метода
+        let componentPointer = this;
         //не недооценивай мощь юзверей
         //проверяем что юзверь вопреки предлагаемому фильтру не загрузил файл не изображения
         //чекаем все mime типы для .jpeg, .jpg, .png, .gif 
@@ -42,14 +46,20 @@ export default class UploadCertificateView extends Component{
         }
         //проверяем форму на валидность после проверки типов файлов
         if(event.target.reportValidity()){
+            //Блокируем элементы формы на время обработки запроса
+            componentPointer.FormDisable(eventForm);
             //передаем в контроллер для загрузки и добавления
             this.props.InsertCertificate(file, certificateDescription,function(error){
                 if(error){
                     alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                    //разблокировка формы по завершению обработки
+                    componentPointer.FormEnable(eventForm);
                 }
                 else{
                     //сбрасываем форму
                     eventForm.reset();
+                    //разблокировка формы по завершению обработки
+                    componentPointer.FormEnable(eventForm);
                 }
             });
         }
@@ -58,6 +68,22 @@ export default class UploadCertificateView extends Component{
     //снимаем флаг ошибки при изменении данных инпута
     ClearValidity(event){
         event.target.setCustomValidity('');
+    }
+
+    //блокировка формы
+    FormDisable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", true );
+        });
+        $(".uploadCertificate h4").html('Обработка запроса...');
+    }
+
+    //разблокировка формы
+    FormEnable(form){
+        Array.from(form).forEach(function(input){
+            $(input).prop( "disabled", false );
+        });
+        $(".uploadCertificate h4").html('Форма добавления нового документа');
     }
 
     render(){

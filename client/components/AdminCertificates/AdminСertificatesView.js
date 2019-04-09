@@ -11,6 +11,9 @@ export default class AdminCertificatesView extends Component{
         this.ClearValidity=this.ClearValidity.bind(this);
         this.CertificateUp=this.CertificateUp.bind(this);
         this.CertificateDown=this.CertificateDown.bind(this);
+        this.FormEnable=this.FormEnable.bind(this);
+        this.FormDisable=this.FormDisable.bind(this);
+        this.ClearFileUpdate=this.ClearFileUpdate.bind(this);
     }
 
     //передача данных для удаления сертификакта в контроллер
@@ -28,15 +31,25 @@ export default class AdminCertificatesView extends Component{
     //передача данных в контроллер для обновления сертификата
     UpdateCertificate(event){
         let certificateId = $(event.target).attr("certificateid");
+        let componentPointer = this;
         //валидация
         //странное поведение в хроме - не всплывает подсказка если валидация внутри условия с конфирм
         if(document.querySelector('form[certificateid="'+certificateId+'"]').reportValidity()){      
             if(confirm("Вы уверены в том, что хотите обновить данные документа подтверждения квалификации?")){
                 let certificateDescription = document.querySelector('textarea[certificateid="'+certificateId+'"]').value;
                 let certificateImageFiles = document.querySelector('input[type="file"][certificateid="'+certificateId+'"]').files;
+                //блокировка формы на время выполнения запроса
+                componentPointer.FormDisable(certificateId);
                 this.props.UpdateCertificate(certificateId,certificateDescription,certificateImageFiles,function(error){
                     if(error){
                         alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                        //блокировка формы на время выполнения запроса
+                        componentPointer.FormEnable(certificateId);
+                    }
+                    else{
+                        //блокировка формы на время выполнения запроса
+                        componentPointer.FormEnable(certificateId);
+                        componentPointer.ClearFileUpdate(certificateId);
                     }
                 });
             }  
@@ -66,6 +79,23 @@ export default class AdminCertificatesView extends Component{
         });
     }
 
+    //блокировка элемента
+    FormDisable(certificateid){
+        $('.AdminCertificateItem input[certificateid="'+certificateid+'"], .AdminCertificateItem textarea[certificateid="'+certificateid+'"]').prop('disabled', true);
+        $('.AdminCertificateItem h4[certificateid="'+certificateid+'"]').html('Запрос обрабатывется');
+    }
+
+    //разблокировка элемента
+    FormEnable(certificateid){
+        $('.AdminCertificateItem input[certificateid="'+certificateid+'"], .AdminCertificateItem textarea[certificateid="'+certificateid+'"]').prop('disabled', false);
+        $('.AdminCertificateItem h4[certificateid="'+certificateid+'"]').html('');
+    }
+
+    //чистим инпут файл
+    ClearFileUpdate(certificateid){
+        $("input[type='file'][certificateid='"+certificateid+"']").val('');
+    }
+
     render(){
         let certificate;
         if(typeof this.props.certificates === "undefined")
@@ -78,7 +108,8 @@ export default class AdminCertificatesView extends Component{
             }
             else{
                 certificate = this.props.certificates.map((certificate) =>
-                <div className='row mt-1 mb-2 pb-2 AdminCertificateItem align-items-center' key={certificate._id}>                
+                <div className='row mt-1 mb-2 pb-2 AdminCertificateItem align-items-center' key={certificate._id}>      
+                    <h4 className='text-center w-100' certificateid={certificate._id}></h4>          
                     <div className='col-md-6'>
                         <img className="w-100 img-thumbnail"  src={certificate.imagesURL} alt={certificate.imagesURL}/>
                         Изображение (если не выбрать - останется неизменным): 
