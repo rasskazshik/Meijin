@@ -1,16 +1,20 @@
 import React,{Component} from 'react';
+//компонент представления админки учетных данных
 import AdminUserDataView from './AdminUserDataView';
 
 export default class AdminUserDataController extends Component{
     constructor(props){
         super(props);
+        //в состоянии храним информацию о старой почте
         this.state={oldEmail:null}
 
         this.UpdateUserData=this.UpdateUserData.bind(this);
     }
 
+    //перед запуском компонента вычитываем данные о старой почте
     componentWillMount(){
         let componentPointer=this;
+        //получаем данные о почте в ответе серверного метода
         Meteor.call('GetUserEmail',function(err,responce){
             if(err){
                 componentPointer.setState({oldEmail:"Ошибка получения электронной почты"});
@@ -21,6 +25,7 @@ export default class AdminUserDataController extends Component{
         });
     }
 
+    //обновление данных
     UpdateUserData(email,oldPassword,newPassword,callback){
         //меняем пароль
         Accounts.changePassword(oldPassword, newPassword,function(error){
@@ -37,16 +42,6 @@ export default class AdminUserDataController extends Component{
                 })   
             }
         });
-    
-
-        // Meteor.call('UpdateUserData',email,oldPassword,newPassword,function(err,responce){
-        //     if(err){
-        //         callback(err);
-        //     }
-        //     else{
-        //         callback(err,responce);
-        //     }
-        // });
     }
 
     render(){

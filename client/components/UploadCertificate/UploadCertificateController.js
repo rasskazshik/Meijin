@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
+//коллекция изображений сертификатов
 import CertificatesImagesCollection from '../../../lib/collections/certificates/certificatesImages';
+//компонент представления загрузки сертификатов
 import UploadCertificateView from './UploadCertificateView';
 
 export default class UploadCertificateController extends Component{
@@ -12,6 +14,7 @@ export default class UploadCertificateController extends Component{
     //добавление нового сертификата
     //file - объект input file
     //certificateDescription - текст описания сертификата
+    //callback - проброс функции представления для реакции на завершение обработки команды
     InsertCertificate(file, certificateDescription, callback){
         //доступ к файлу на стороне клиента (при таком подходе не могу сделать это в серверном методе)
         //осуществляем запись в коллекцию файлов

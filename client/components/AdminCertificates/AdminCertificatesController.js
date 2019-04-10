@@ -1,6 +1,9 @@
 import React,{Component} from 'react';
+//представление компонента админки сертификатов
 import AdminCertificatesView from './AdminСertificatesView';
+//Коллекция сертификатов
 import CertificatesCollection from '../../../lib/collections/certificates/certificates';
+//"обертка" данных
 import { withTracker } from 'meteor/react-meteor-data';
 
 class AdminCertificatesController extends Component{
@@ -14,6 +17,7 @@ class AdminCertificatesController extends Component{
     }
 
     //вызов серверного метода для удаления всех данных сертификата
+    //callback - проброс функции представления, для сигнала о завершении операции
     DeleteCertificate(sertificateId,callback){
         Meteor.call('DeleteCertificate',sertificateId,function(error){
             if(error){
@@ -26,8 +30,9 @@ class AdminCertificatesController extends Component{
     }
 
     //вызов серверного метода обновления данных документа подтверждающего квалификацию
+    //callback - проброс функции представления, для сигнала о завершении операции
     UpdateCertificate(certificateId,certificateDescription,certificateImageFiles,callback){
-        //certificateImage.imageURL, imageId:certificateImage.imageId
+        //массив изображений
         let certificateImage=[];
         //если обновляется изображение
         if(certificateImageFiles.length>0){
@@ -43,11 +48,13 @@ class AdminCertificatesController extends Component{
                             callback(error);
                         } 
                         else {
-                            //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
+                            //объект с данными изображения
                             let certificateImageItem = {};
+                            //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
                             certificateImageItem.imageURL = '/cfs/files/certificatesImages/' + fileObj._id;
                             certificateImageItem.imageId = fileObj._id;
                             certificateImage.push(certificateImageItem);
+                            //серверный метод обновления коллекции сертификатов
                             Meteor.call('UpdateCertificate',certificateId,certificateDescription,certificateImage,function(error){
                                 if (error){
                                     callback(error);
@@ -73,6 +80,8 @@ class AdminCertificatesController extends Component{
         }        
     }
 
+    //вызов серверного метода для поднятия записи в списке
+    //callback - проброс функции представления, для сигнала о завершении операции
     CertificateUp(certificateId,callback){
         Meteor.call('CertificateUp',certificateId,function(error){
             if (error){
@@ -84,6 +93,8 @@ class AdminCertificatesController extends Component{
         });
     }
 
+    //вызов серверного метода для понижения записи в списке
+    //callback - проброс функции представления, для сигнала о завершении операции
     CertificateDown(certificateId,callback){
         Meteor.call('CertificateDown',certificateId,function(error){
             if (error){
@@ -95,11 +106,13 @@ class AdminCertificatesController extends Component{
         });
     }
 
+    //рендер представления с пробросом методов компонента контроллера и набором данных
     render(){
         return <AdminCertificatesView certificates={this.props.certificates} DeleteCertificate={this.DeleteCertificate} UpdateCertificate={this.UpdateCertificate} CertificateUp={this.CertificateUp} CertificateDown={this.CertificateDown}/>;
     }
 }
 
+//подписка на данные с сортировкой позиции
 export default withTracker((props) => {
     Meteor.subscribe('certificates');
     return {

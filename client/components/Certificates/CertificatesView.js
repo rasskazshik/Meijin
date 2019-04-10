@@ -1,4 +1,5 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
 
 export default class CertificatesView extends Component{
@@ -8,6 +9,7 @@ export default class CertificatesView extends Component{
     }
 
     render(){
+        //верстка списка сертификатов
         let certificate;
         if(typeof this.props.certificates === "undefined")
         {

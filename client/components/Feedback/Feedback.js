@@ -21,16 +21,22 @@ export default class Feedback extends Component{
         if(messageField.value===''){
             messageField.setCustomValidity('Это поле должно быть заполнено');
         }
+        //проверка валидации
         if(event.target.reportValidity()){
+            //отключение формы на время обработки запроса
             componentPointer.FormDisable(form);
+            //формирование сообщения
             let message='От кого: '+emailField.value+'; Сообщение: '+messageField.value;
+            //серверная функция отправки сообщения
             Meteor.call('SendEmail',message,function(error){
                 if(error){
                     alert('Во время выполнения операции возникли ошибки. ('+error+')');
+                    //включаем форму по завершении операции
                     componentPointer.FormEnable(form);
                 }
                 else{
                     alert('Сообщение было успешно отправлено');
+                    //включаем форму по завершении операции
                     componentPointer.FormEnable(form);
                     form.reset();
                 }
@@ -38,6 +44,7 @@ export default class Feedback extends Component{
         }
     }
 
+    //отключение формы
     FormDisable(form){
         Array.from(form).forEach(function(input){
             $(input).prop( "disabled", true );
@@ -45,6 +52,7 @@ export default class Feedback extends Component{
         $(".feedbackForm h6").html('Сообщение отправляется...');
     }
 
+    //включение формы
     FormEnable(form){
         Array.from(form).forEach(function(input){
             $(input).prop( "disabled", false );

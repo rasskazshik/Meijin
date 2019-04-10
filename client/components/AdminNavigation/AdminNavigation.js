@@ -10,16 +10,20 @@ export default class AdminNavigation extends Component{
         let componentPointer = this;
         //делигированная обработка клика на элемент меню
         $('.adminContentList').on("click","p",function(event){
+            //смотрим тип действия
             let content = $(event.target).attr('content');
+            //если в контенте команда разлогиниться - выполняем
             if(content==="logout"){
                 componentPointer.props.Logout();
             }
+            //иначе - идем куда послали с помощью проброшенного метода (запускает ререндер родительского компонента)
             else{
                 componentPointer.props.SetContentType(content);
             }
         });
     }
 
+    //рендер с выделением активного компонента согласно проброшенным данным
     render(){
         return(
             <div className='adminContentList'>

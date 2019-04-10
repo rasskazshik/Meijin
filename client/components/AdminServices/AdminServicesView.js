@@ -1,6 +1,9 @@
 import React,{Component} from 'react';
+//компонент заголовка
 import Header from '../Header/Header';
+//компонент слайдера с изображениями услуги
 import ServiceSlider from '../ServiceSlider/ServiceSliderController';
+//компонент добавления услуги
 import UploadService from '../UploadService/UploadServiceController';
 
 export default class AdminServicesView extends Component{
@@ -25,6 +28,7 @@ export default class AdminServicesView extends Component{
         });
     }
 
+    //удаление услуги
     DeleteService(event){
         if(confirm('Вы уверены в том, что хотите удалить услугу?')){
             let serviceId = $(event.target).attr('serviceid');
@@ -35,8 +39,11 @@ export default class AdminServicesView extends Component{
     //передача данных для обновления в метод контроллера
     UpdateService(event){
         event.preventDefault();
+        //получаем идентификатор
         let serviceId = $(event.target).attr('serviceid');
+        //указатель на компонент для доступа из вложенных функций
         let componentPointer = this;
+        //данные синтетического события для доступа из вложенных функций (форма)
         let targetForm = event.target;
         let title = $(".updateServiceForm[serviceid='"+serviceId+"'] .title").val();
         let description = $(".updateServiceForm[serviceid='"+serviceId+"'] .description").val();
@@ -132,6 +139,7 @@ export default class AdminServicesView extends Component{
     }
 
     render(){
+        //формируем список услуг
         let servicesItems;
         if(this.props.services.length<1){
             servicesItems=(<div className="text-center">Список пуст</div>);

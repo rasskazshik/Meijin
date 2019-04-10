@@ -1,17 +1,17 @@
 import React,{Component} from 'react';
-import { withTracker } from 'meteor/react-meteor-data';
+//компонент заглавия
 import Header from '../Header/Header';
-import servicesCollection from '../../../lib/collections/services/services';
+//компонент слайдера изображений услуги
 import ServiceSlider from '../ServiceSlider/ServiceSliderController';
 
-class Services extends Component{
+export default class ServicesView extends Component{
     constructor(props){
         super(props);
 
     }
 
+    //действие после отрисовки компонента
     componentDidMount(){
-
         //делигированная обработка клика по элементу списка услуг (анимированное открытие и закрытие)
         $(".servicesContainer").on("click",".servicesItem",function(event){
             let serviceId = $(event.target).attr("serviceid");
@@ -47,11 +47,3 @@ class Services extends Component{
         );
     }
 }
-
-
-export default withTracker((props) => {
-    Meteor.subscribe('services');
-    return {
-        services: servicesCollection.find({},{sort:{position: -1}}).fetch()
-    };
-})(Services);

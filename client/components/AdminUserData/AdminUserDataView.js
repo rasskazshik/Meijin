@@ -1,4 +1,5 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
 
 export default class AdminUserDataView extends Component{
@@ -50,6 +51,7 @@ export default class AdminUserDataView extends Component{
                     alert("Данные успешно изменены");
                     //включаем форму
                     componentPointer.FormEnable(eventForm);
+                    //чистим поля
                     componentPointer.ClearPasswordsFields();
                 }
             });

@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
+//компонент добавления сертификатов
 import UploadCertificate from '../UploadCertificate/UploadCertificateController';
+//компонент заголовка
 import Header from '../Header/Header';
 
 export default class AdminCertificatesView extends Component{
@@ -28,9 +30,10 @@ export default class AdminCertificatesView extends Component{
         }
     }
 
-    //передача данных в контроллер для обновления сертификата
+    //передача данных в контроллер для обновления данных сертификата
     UpdateCertificate(event){
         let certificateId = $(event.target).attr("certificateid");
+        //указатель на компонент для доступа к нему из вложенных функций
         let componentPointer = this;
         //валидация
         //странное поведение в хроме - не всплывает подсказка если валидация внутри условия с конфирм
@@ -40,14 +43,15 @@ export default class AdminCertificatesView extends Component{
                 let certificateImageFiles = document.querySelector('input[type="file"][certificateid="'+certificateId+'"]').files;
                 //блокировка формы на время выполнения запроса
                 componentPointer.FormDisable(certificateId);
+                //передача данных в контроллер
                 this.props.UpdateCertificate(certificateId,certificateDescription,certificateImageFiles,function(error){
                     if(error){
                         alert('Во время выполнения операции возникли ошибки. ('+error+')');
-                        //блокировка формы на время выполнения запроса
+                        //разблокировка формы при завершении выполнения запроса
                         componentPointer.FormEnable(certificateId);
                     }
                     else{
-                        //блокировка формы на время выполнения запроса
+                        //разблокировка формы при завершении выполнения запроса
                         componentPointer.FormEnable(certificateId);
                         componentPointer.ClearFileUpdate(certificateId);
                     }
@@ -61,6 +65,7 @@ export default class AdminCertificatesView extends Component{
         event.target.setCustomValidity('');
     }
 
+    //передача данных в контроллер для поднятия записи в списке
     CertificateUp(){
         let certificateId = $(event.target).attr("certificateid");
         this.props.CertificateUp(certificateId,function(error){
@@ -70,6 +75,7 @@ export default class AdminCertificatesView extends Component{
         });
     }
 
+    //передача данных в контроллер для понижения записи в списке
     CertificateDown(){
         let certificateId = $(event.target).attr("certificateid");
         this.props.CertificateDown(certificateId,function(error){
@@ -97,6 +103,7 @@ export default class AdminCertificatesView extends Component{
     }
 
     render(){
+        //формируем верстку списка сертификатов
         let certificate;
         if(typeof this.props.certificates === "undefined")
         {

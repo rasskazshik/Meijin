@@ -1,23 +1,31 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
+//компонент нафигации по разделам админки
 import AdminNavigation from '../AdminNavigation/AdminNavigation';
+//компонент админки сертификатов
 import AdminCertificates from '../AdminCertificates/AdminCertificatesController';
+//компонент админки услуг
 import AdminServices from '../AdminServices/AdminServicesController';
+//компонент админки учетных данных пользователя
 import AdminUserData from '../AdminUserData/AdminUserDataController';
 
 export default class AdminContent extends Component{
     constructor (props){
         super(props);
+        //contentType:'services' - выбор раздела по умолчанию
         this.state={contentType:'services'};
 
         this.SetContentType=this.SetContentType.bind(this);
     }
 
+    //обновление состояния с выбором раздела для ререндеринга
     SetContentType(contentType){
         this.setState({contentType:contentType});
     }
 
     render(){
+        //выбор рендера компонента в зависимости от состояния
         let content;
         switch (this.state.contentType){
             case 'certificates':
@@ -31,6 +39,7 @@ export default class AdminContent extends Component{
                 break;
         }
 
+        //проброс информации о текущем состоянии и методов изменения состояния и выхода из учетной записи
         return(
             <div>
                 <Header title='Меню администратора'/>

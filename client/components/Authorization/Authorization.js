@@ -1,4 +1,5 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
 
 export default class Authorization extends Component{
@@ -6,11 +7,16 @@ export default class Authorization extends Component{
         super(props);
 
         this.SubmitAuthorization = this.SubmitAuthorization.bind(this);
-        this.Login=this.Login.bind(this);
     }
 
-    Login(email,password){
+    //авторизация пользователя
+    SubmitAuthorization(event){
+        event.preventDefault();
+        let email = $(".email-tb").val();
+        let password = $(".password-tb").val();
+        //указатель на компонент для доступа из вложенных функций
         let componentPointer = this;
+        //авторизация с паролем
         Meteor.loginWithPassword(email,password,function(err){
             if(err){
                 console.log('Ошибка авторизации: '+err);
@@ -22,16 +28,10 @@ export default class Authorization extends Component{
                 }
             }
             else{
+                //обновляем статус пользователя в родительском компоненте
                 componentPointer.props.UpdateAuthUserData();
             }
-        });        
-    }
-
-    SubmitAuthorization(event){
-        event.preventDefault();
-        let email = $(".email-tb").val();
-        let password = $(".password-tb").val();
-        this.Login(email,password);
+        });  
     }
 
     render(){

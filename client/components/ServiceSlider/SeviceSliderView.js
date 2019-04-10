@@ -8,7 +8,7 @@ export default class ServiceSliderView extends Component{
 
     render(){
         //проверяем наличие изображений в услуге, если их нет - генерим пустой контейнер
-        if(this.props.service.images.length<1){
+        if(typeof this.props.service==='undefined'||this.props.service.images.length<1){
             return(<div></div>);
         }
 
@@ -23,6 +23,7 @@ export default class ServiceSliderView extends Component{
             </div>
         );
 
+        //верстаем карусель
         return(
                 <div id={"carouselService"+this.props.service._id} className="carousel slide" data-ride="carousel">
                     <ol className="carousel-indicators">

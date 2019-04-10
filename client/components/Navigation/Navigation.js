@@ -5,6 +5,8 @@ export default class Navigation extends Component{
 
     render(){
 
+        //адаптивное меню навигации
+        //при соответствующем брекпоинте отображается выпадающее меню
         return(
             <div>
                 <button className="navigationButton dropdown-toggle w-100 d-md-none" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

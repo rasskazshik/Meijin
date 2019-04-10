@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
+//компонент обратной связи
 import Feedback from '../Feedback/Feedback';
 
 export default class HowFind extends Component{
@@ -9,9 +11,13 @@ export default class HowFind extends Component{
         this.state={};
     }
 
+    //действия после отрисовки объектов
     componentDidMount(){
+        //привязка обработчика события смены слайда
         $('#carouselHowFind').on('slide.bs.carousel', function (event) {
+            //указатель на сменяемый
             let index = event.to;
+            //выделение актуального элемента в списке
             $('[listindex]').removeClass('activeList');
             let element = $('[listindex=\''+index+'\']');
             element.addClass('activeList');
@@ -21,6 +27,7 @@ export default class HowFind extends Component{
     render(){
         
         //слайдер с маршрутом к кабинету(изображение-статика и номер из списка)
+        //при смене слайда - выделяется соответствующий элемент списка
         const HowFindSlider=(
             <div className='container howFindSlider'>
                 <div id="carouselHowFind" className="carousel slide" data-ride="carousel">

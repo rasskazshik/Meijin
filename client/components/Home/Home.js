@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
-import Feedback from '../Feedback/Feedback';
-import Slider from '../Slider/Slider'
 
 export default class Home extends Component{
 

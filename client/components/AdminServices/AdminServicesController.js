@@ -1,6 +1,9 @@
 import React,{Component} from 'react';
+//обертка данными
 import { withTracker } from 'meteor/react-meteor-data';
+//компонент представления админки учетных данных пользователя
 import AdminServicesView from './AdminServicesView'
+//коллекция услуг
 import servicesCollection from '../../../lib/collections/services/services';
 
 
@@ -19,6 +22,8 @@ class AdminServicesController extends Component{
         Meteor.call('DeleteService',serviceId);
     }
 
+    //обновление данных услуги    
+    //callback - проброс функции представления, для сигнала о завершении операции
     UpdateService(serviceId,title, description, price, images,callback){
         //формируем массив путей изображений связанных с услугой
         //в случае отсутствия новых - передаем пустой, серверный метод разберется сам что с ним делать
@@ -60,8 +65,8 @@ class AdminServicesController extends Component{
                                 serviceImages.push(imageItem); 
                                 //если обработали последний файл 
                                 if(i===images.length-1){
-                                    //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-                                    Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error,responce){
+                                    //осуществляем вызов серверного метода для работы с коллекцией
+                                    Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error){
                                         if(error){
                                             //удаляем связанные файлы
                                             serviceImages.forEach(function(item) {
@@ -84,8 +89,9 @@ class AdminServicesController extends Component{
                 }
             });
         }
+        //если без изображений
         else{
-            //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
+            //осуществляем вызов серверного метода для работы с коллекцией
             Meteor.call("UpdateServiceData",serviceId,title, description, price, serviceImages,function(error,responce){
                 if(error){
                     callback(error);
@@ -98,7 +104,8 @@ class AdminServicesController extends Component{
 
     }
 
-    
+    //поднятие объекта в списке
+    //callback - проброс функции представления, для сигнала о завершении операции
     ServiceUp(serviceId,callback){
         Meteor.call('ServiceUp',serviceId,function(error){
             if (error){
@@ -110,6 +117,8 @@ class AdminServicesController extends Component{
         });
     }
 
+    //понижение объекта в списке
+    //callback - проброс функции представления, для сигнала о завершении операции
     ServiceDown(serviceId,callback){
         Meteor.call('ServiceDown',serviceId,function(error){
             if (error){
@@ -121,12 +130,13 @@ class AdminServicesController extends Component{
         });
     }
 
+    //ренденр с пробросом данных услуг и методов
     render(){
         return(<AdminServicesView services={this.props.services} DeleteService={this.DeleteService} UpdateService={this.UpdateService} ServiceUp={this.ServiceUp} ServiceDown={this.ServiceDown}/>);
     }
 }
 
-
+//подписка на данные с сортировкой позиции
 export default withTracker((props) => {
     Meteor.subscribe('services');
     return {

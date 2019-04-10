@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
+//коллекция изображений услуг
 import servicesImagesCollection from '../../../lib/collections/services/servicesImages';
+//компонент представления загрузки услуги
 import UploadServiceView from './UploadServiceView';
 
 export default class UploadServicesController extends Component{

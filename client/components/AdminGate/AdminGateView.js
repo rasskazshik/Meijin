@@ -1,6 +1,9 @@
 import React,{Component} from 'react';
+//компонент админки
 import AdminContent from '../AdminContent/AdminContent';
+//компонент авторизации
 import Authorization from '../Authorization/Authorization';
+//компонент создания учетной записи
 import CreateUser from '../CreateUser/CreateUser';
 
 export default class AdminGateView extends Component{
@@ -10,6 +13,8 @@ export default class AdminGateView extends Component{
     }
 
     render(){
+        //рендер соответствующего компонента согласно проброшенным из контроллера данным
+        //дальнейший проброс методов связанных с учетными данными
         switch(this.props.type){
             case 'create':
                 return (<CreateUser UpdateAuthUserData={this.props.UpdateAuthUserData}/>);

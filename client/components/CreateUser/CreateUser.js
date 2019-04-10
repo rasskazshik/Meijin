@@ -1,32 +1,37 @@
 import React,{Component} from 'react';
+//компонент заглавия
 import Header from '../Header/Header';
 
 export default class CreateUser extends Component{
     constructor(props){
         super(props);
+
         this.SubmitCreateUser=this.SubmitCreateUser.bind(this);
         this.ClearValidity=this.ClearValidity.bind(this);
     }
 
+    //создание нового пользователя
     SubmitCreateUser(event){
         event.preventDefault();
         let email = $(".email-tb").val();
         let password = $(".password-tb").val();
         let repeat = $(".password-repeat-tb").val();
         let componentPointer = this;
+        //проверка повтора пароля
         if(password===repeat){
+            //добавление пользователя в систему
             Accounts.createUser({username:"Admin",password:password,email:email},function(err){
                 if(err){
-                    console.log('Ошибка создания учетной записи администратора: '+err);
                     alert('Свяжитесь с разработчиком. Ошибка создания учетной записи администратора: '+err);
                 }
                 else{
-                    console.log('Учетная запись создана');
+                    //обновление данных пользователя в родительском компоненте
                     componentPointer.props.UpdateAuthUserData();
                 }
             });
         }
         else{
+            //сообщение о несовподающих паролях
             document.querySelector(".password-repeat-tb").setCustomValidity('Повтор пароля не совпадает');
             event.target.reportValidity();
         }

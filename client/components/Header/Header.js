@@ -6,6 +6,7 @@ export default class Header extends Component{
     }
 
     render(){
+        //рендер с опциональным дополнительным описанием заглавия
         return(
             <div className='header'>
                 <h3 className='text-center'>{this.props.title}</h3>

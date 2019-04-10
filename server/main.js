@@ -14,8 +14,8 @@ import servicesCollection from '../lib/collections/services/services';
 
 Meteor.startup(() => {
 
-  //настраиваем переменную окружения на использование smtp
-  process.env.MAIL_URL = 'smtps://studpostsmtp@gmail.com:123698745smtp@smtp.gmail.com:465';
+  //настраиваем переменную окружения на использование smtp от gmail для локального запуска
+  //process.env.MAIL_URL = 'smtps://user:password@smtp.gmail.com:465';
 
   //определяем серверные функции для действий с коллекциями
   Meteor.methods({
@@ -32,11 +32,14 @@ Meteor.startup(() => {
       let position = CertificatesCollection.find({}).count();
       //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
       //о загрузке файла на сервер...
-      //делаем таймер в полсекунды и опраштваем файл о том как он устроился на сервере
+      //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
       //когда сказал что примостился - пишем связанную коллекцию
       let imageWaiter = Meteor.setInterval(function(){
-        if(CertificatesImagesCollection.findOne({_id:imageId}).hasStored('certificatesImages')){          
+        //если лежит на сервере
+        if(CertificatesImagesCollection.findOne({_id:imageId}).hasStored('certificatesImages')){    
+          //гасим таймер      
           Meteor.clearInterval(imageWaiter);
+          //пишем в связанную коллекцию
           CertificatesCollection.insert({description:certificateDescription ,imagesURL:imageURL, imageId:imageId, position:position});
         }
       },500);
@@ -90,7 +93,7 @@ Meteor.startup(() => {
 
         //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
         //о загрузке файла на сервер...
-        //делаем таймер в полсекунды и опраштваем файл о том как он устроился на сервере
+        //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
         //когда сказал что примостился - пишем связанную коллекцию
         let imageWaiter = Meteor.setInterval(function(){
           if(CertificatesImagesCollection.findOne({_id:certificateImage[0].imageId}).hasStored('certificatesImages')){          
@@ -116,19 +119,26 @@ Meteor.startup(() => {
       let position = servicesCollection.find({}).count();
       //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
       //о загрузке файла на сервер...
-      //делаем таймер в полсекунды и опраштваем каждый файл о том как он устроился на сервере
+      //делаем таймер в полсекунды и опрашиваем каждый файл о том как он устроился на сервере
       //когда все сказали что примостились - пишем связанную коллекцию
       let imageWaiter = Meteor.setInterval(function(){
+        //флаг готовности всех файлов
         let ready = true;
+        //пробег по списку файлов
         for(let i=0;i<serviceImages.length; i++){  
+          //если не на сервере
           if(!servicesImagesCollection.findOne({_id:serviceImages[i].imageId}).hasStored('servicesImages'))
           {
+            //сбрасываем флаг готовности
             ready=false;
             break;
           }
         }
+        //проверяем флаг готовности
         if(ready){
+          //гасим таймер
           Meteor.clearInterval(imageWaiter);
+          //пишем в связанную коллекцию
           servicesCollection.insert({title:serviceTitle ,description:serviceDescription, price:servicePrice, images:serviceImages, position:position});
         }
       },500);   
@@ -139,6 +149,7 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //ищем данные услуги
       let service = servicesCollection.findOne({_id:serviceId});
       //чистим коллекцию изображений
       service.images.forEach(function(image){
@@ -146,6 +157,7 @@ Meteor.startup(() => {
       });
       //запоминаем позицию удаляемой услуги
       let position = service.position;
+      //удаляем услугу
       servicesCollection.remove({_id:serviceId},function(){
         //смещаем позицию всех, кто выше на 1 вниз (множественная обработка - опция мульти)
         servicesCollection.update({position:{$gt: position}},{$inc: {position: -1}},{ multi: true });
@@ -180,21 +192,28 @@ Meteor.startup(() => {
       if(serviceImages.length>0){
         //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
         //о загрузке файла на сервер...
-        //делаем таймер в полсекунды и опраштваем каждый файл о том как он устроился на сервере
+        //делаем таймер в полсекунды и опрашиваем каждый файл о том как он устроился на сервере
         //когда все сказали что примостились - пишем связанную коллекцию
         let imageWaiter = Meteor.setInterval(function(){
+          //флаг готовности файлов
           let ready = true;
+          //пробег по списку
           for(let i=0;i<serviceImages.length; i++){  
+            //если не готов
             if(!servicesImagesCollection.findOne({_id:serviceImages[i].imageId}).hasStored('servicesImages'))
             {
+              //сбрасываем флаг готовности
               ready=false;
               break;
             }
           }
+          //если все готовы
           if(ready){
+            //гасим таймер
             Meteor.clearInterval(imageWaiter);
-            //полная замена данных
+            //сохраняем позицию
             let position = servicesCollection.findOne({_id:serviceId}).position;
+            //полная замена данных
             servicesCollection.update({_id:serviceId},{title:title ,description:description, price:price, images:serviceImages, position:position});
           }
         },500);
@@ -215,6 +234,7 @@ Meteor.startup(() => {
       }
     },
 
+    //получение электронной почты пользователя
     GetUserEmail:function(){
       //проверяем право выполнения
       if(Meteor.userId()===null){
@@ -230,15 +250,20 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //заменяем данные почты
       let userId = Meteor.userId();
       let user = Meteor.users.findOne({_id:userId});
+      //удаляем почту
       Accounts.removeEmail(userId, user.emails[0].address);
+      //добавляем почту
       Accounts.addEmail(userId, newEmail);
     },
 
     //отправка сообшения через форму обратной связи
     SendEmail:function(message){ 
       //ловим ошибки smtp и пробрасываем их клиенту сконвертировав в ошибку метеора
+      //эта зараза сообщает о не настроенном MAIL_URL лишь в стандартном выводе - хрен поймаешь
+      //обязательно тестируй после деплоя глядя в терминал
       try{
         Email.send({ to:'rasskazshik@gmail.com', from:'studpostsmtp@gmail.com', subject:'Сообщение с сайта', text:message });
       }
@@ -253,10 +278,10 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //получаем данные сертификата
       let target = CertificatesCollection.findOne({_id:id});
       let targetPosition = target.position;
       //если и так верхний - тихо закончим на этом
-      let count = CertificatesCollection.find({}).count();
       if(targetPosition===CertificatesCollection.find({}).count()-1){
         return;
       }      
@@ -273,6 +298,7 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //получение данных сертификата
       let target = CertificatesCollection.findOne({_id:id});
       let targetPosition = target.position;
       //если и так нижний - тихо закончим на этом
@@ -291,10 +317,10 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //получение данных услуги
       let target = servicesCollection.findOne({_id:id});
       let targetPosition = target.position;
       //если и так верхний - тихо закончим на этом
-      let count = servicesCollection.find({}).count();
       if(targetPosition===servicesCollection.find({}).count()-1){
         return;
       }      
@@ -311,6 +337,7 @@ Meteor.startup(() => {
       if(Meteor.userId()===null){
         throw new Meteor.Error(403,'Выполнение метода в обход процедуры авторизации','Метод был вызван без данных авторизованного пользователя');
       }
+      //получение данных услуги
       let target = servicesCollection.findOne({_id:id});
       let targetPosition = target.position;
       //если и так нижний - тихо закончим на этом
