@@ -30,7 +30,7 @@ export default class App extends Component
                 <Route exact path='/certificates' component={Certificates}/>
                 <Route exact path='/services' component={Services}/>
                 <Route exact path='/admin' component={AdminGate}/>
-                <Route path="*" component={Page404}/>
+                <Route component={Page404}/>
             </div>
             <Footer/>
         </div>

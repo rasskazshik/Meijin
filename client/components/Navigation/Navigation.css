@@ -27,7 +27,7 @@
     text-decoration: none;
     color: #383838;
     padding: 10px;
-    font-size: 1.3rem;
+    font-size: 2rem;
     cursor: pointer;
     border-bottom: 1px solid lightgray;
 }
@@ -38,5 +38,5 @@
 
 .navigationButton{
     background-color: #ffffffb3;
-    font-size:1.5rem;
+    font-size:2rem;
 }
