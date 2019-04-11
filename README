@@ -14,7 +14,7 @@ To install application (VPS Ubuntu sample):
 4 - upload .tar.gz to the server via ssh
     scp Meijin.tar.gz user@host:/home/meteor
 5 - unpack .tar.gz file
-    tar -xf meteor
+    tar -xf Meijin.tar.gz
 6 - cd to folder unpacked application and install it
     cd programs/server && npm install
 7 - set environment variables 
@@ -22,15 +22,17 @@ To install application (VPS Ubuntu sample):
     MONGO_URL='mongodb://localhost:27017/meteor'
     ROOT_URL='http://example.com'
     MAIL_URL='smtp://user:password@mailhost:port'
-8 - cd to folder unpacked application and start it 
+8 - reboot system
+    shutdown -r now
+9 - cd to folder unpacked application and start it 
     node main.js
-8.1 - to automatic start application on start server install pm2
+9.1 - to automatic start application on start server install pm2
     npm install pm2 -g
-8.2 - start application like daemon (pm2 process)
+9.2 - start application like daemon (pm2 process)
     pm2 start main.js
-8.3 - enable startup processes 
+9.3 - enable startup processes 
     pm2 startup
-8.4 - save current process list
+9.4 - save current process list
     pm2 save
-8.5 - reboot system
+9.5 - reboot system
     shutdown -r now

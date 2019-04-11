@@ -122,7 +122,7 @@ export default class AdminServicesView extends Component{
         Array.from(form).forEach(function(input){
             $(input).prop( "disabled", true );
         });
-        $("form[serviceid='"+serviceId+"'] h4").html('Идет обработка запроса');
+        $("form[serviceid='"+serviceId+"'] .servicesItemUploadHeader").html('Идет обработка запроса');
     }
 
     //разблокировка формы
@@ -130,7 +130,7 @@ export default class AdminServicesView extends Component{
         Array.from(form).forEach(function(input){
             $(input).prop( "disabled", false );
         });
-        $("form[serviceid='"+serviceId+"'] h4").html('');
+        $("form[serviceid='"+serviceId+"'] .servicesItemUploadHeader").html('');
     }
 
     //чистим инпут файл
@@ -148,7 +148,7 @@ export default class AdminServicesView extends Component{
             servicesItems=this.props.services.map((item)=>
                 <div className='servicesItemContainer' key={item._id}>                    
                     <form className='updateServiceForm' serviceid={item._id} onSubmit={this.UpdateService}>
-                        <h4 className='w-100 text-center'></h4>
+                        <h4 className='w-100 text-center servicesItemUploadHeader'></h4>
                         <h4 className='servicesItem' serviceid={item._id}>{item.title}</h4>                    
                         <div serviceid={item._id}>
                             <p>
