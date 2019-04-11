@@ -18,7 +18,35 @@ Meteor.startup(() => {
   //process.env.MAIL_URL = 'smtps://user:password@smtp.gmail.com:465';
 
   //определяем серверные функции для действий с коллекциями
-  Meteor.methods({
+  Meteor.methods({    
+
+    //костыль - проверка доступности изображений услуг на сервере
+    //filesId - массив идентификаторов файлов для проверки
+    ServiceImagesOnTheServer:function(filesId){
+      //флаг наличия всех файлов на сервере
+      let allFilesOnTheServer = true;
+      //пробег по массиву файлов
+      for(let i=0;i<filesId.length;i++)
+      {
+        //если не лежит на сервере
+        if(!servicesImagesCollection.findOne({_id:filesId[i]}).hasStored('servicesImages')){    
+          //снимаем флаг наличия файлов
+          allFilesOnTheServer = false;
+          break;
+        }
+      }
+      //возвращаем флаг наличия файлов на сервере
+      return allFilesOnTheServer;
+    },
+
+    //костыль - проверка доступности изображения сертификата на сервере
+    //filesId - идентификатор файла для проверки
+    CertificateImageOnTheServer:function(fileId){
+      //флаг наличия файла на сервере
+      let fileOnTheServer = CertificatesImagesCollection.findOne({_id:fileId}).hasStored('certificatesImages');
+      //возвращаем флаг наличия файлов на сервере
+      return fileOnTheServer;
+    },
 
     //добавление нового сертификата с описанием
     //sertificateDescription - описание сертификата 
@@ -30,19 +58,8 @@ Meteor.startup(() => {
       }
       //вычисляем позицию добавляемого сертификата путем подсчета имеющихся
       let position = CertificatesCollection.find({}).count();
-      //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
-      //о загрузке файла на сервер...
-      //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
-      //когда сказал что примостился - пишем связанную коллекцию
-      let imageWaiter = Meteor.setInterval(function(){
-        //если лежит на сервере
-        if(CertificatesImagesCollection.findOne({_id:imageId}).hasStored('certificatesImages')){    
-          //гасим таймер      
-          Meteor.clearInterval(imageWaiter);
-          //пишем в связанную коллекцию
-          CertificatesCollection.insert({description:certificateDescription ,imagesURL:imageURL, imageId:imageId, position:position});
-        }
-      },500);
+      //пишем в связанную коллекцию
+      CertificatesCollection.insert({description:certificateDescription ,imagesURL:imageURL, imageId:imageId, position:position});
     },
 
     //удаление изображения сертификата по id изображения  
@@ -117,31 +134,8 @@ Meteor.startup(() => {
       }
       //вычисляем позицию добавляемой услуги путем подсчета имеющихся
       let position = servicesCollection.find({}).count();
-      //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
-      //о загрузке файла на сервер...
-      //делаем таймер в полсекунды и опрашиваем каждый файл о том как он устроился на сервере
-      //когда все сказали что примостились - пишем связанную коллекцию
-      let imageWaiter = Meteor.setInterval(function(){
-        //флаг готовности всех файлов
-        let ready = true;
-        //пробег по списку файлов
-        for(let i=0;i<serviceImages.length; i++){  
-          //если не на сервере
-          if(!servicesImagesCollection.findOne({_id:serviceImages[i].imageId}).hasStored('servicesImages'))
-          {
-            //сбрасываем флаг готовности
-            ready=false;
-            break;
-          }
-        }
-        //проверяем флаг готовности
-        if(ready){
-          //гасим таймер
-          Meteor.clearInterval(imageWaiter);
-          //пишем в связанную коллекцию
-          servicesCollection.insert({title:serviceTitle ,description:serviceDescription, price:servicePrice, images:serviceImages, position:position});
-        }
-      },500);   
+      //пишем в связанную коллекцию
+      servicesCollection.insert({title:serviceTitle ,description:serviceDescription, price:servicePrice, images:serviceImages, position:position});
     },
 
     //удаление услуги и связанных с ней изображений

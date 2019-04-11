@@ -61,27 +61,63 @@ export default class UploadServicesController extends Component{
                     imageItem.imageId = fileObj._id;;
                     //добавляем в массив путей
                     serviceImages.push(imageItem);  
+                    //если все файлы переданы в коллекцию
                     if(i===files.length-1)  {
-                        //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-                        Meteor.call("InsertService",serviceTitle, serviceDescription, servicePrice, serviceImages,function(error) {
-                            if (error){
-                                console.log("Нашкобнулась запись в коллекцию: "+error);
-                                //удаляем связанные файлы
-                                serviceImages.forEach(function(item) {
-                                    Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
-                                        if (error){
-                                            console.log("Нашкобнулось сервисное удаление файла: "+error);
-                                            callback(error);
-                                        }
+                        //далее - наркомания с опросом состояния загрузки файла на сервере...
+                        //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
+                        //о загрузке файла на сервер...
+                        //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
+                        //когда сказал что примостился - пишем связанную коллекцию
+                        //формируем массив идентификаторов файлов (метод унифицирован для услуг и сертификатов)
+                        let filesId = [];
+                        for(let j=0;j<serviceImages.length;j++){
+                            filesId.push(serviceImages[j].imageId);
+                        }
+                        let imageWaiter = Meteor.setInterval(function(){
+                            //передаем серверу массив файлов для проверки наличия
+                            Meteor.call('ServiceImagesOnTheServer',filesId,function(error,responce){
+                                if (error){
+                                    //гасим таймер      
+                                    Meteor.clearInterval(imageWaiter);
+                                    //удаляем связанные файлы
+                                    serviceImages.forEach(function(item) {
+                                        Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
+                                            if (error){
+                                                console.log("Нашкобнулось сервисное удаление файла: "+error);
+                                                callback(error);
+                                            }
+                                        });
                                     });
-                                });
-                                callback(error);
-                            }
-                            else {
-                                console.log("Данные успешно добавлены в коллекции");
-                                callback();
-                            }              
-                        });
+                                    callback(error);
+                                }
+                                else {                                     
+                                    //если весь массив файлов лежит на сервере - пишем коллекцию
+                                    if(responce){    
+                                        //гасим таймер      
+                                        Meteor.clearInterval(imageWaiter);
+                                        //пишем в связанную коллекцию
+                                        //осуществляем вызов серверного метода для работы с коллекцией
+                                        Meteor.call("InsertService",serviceTitle, serviceDescription, servicePrice, serviceImages,function(error) {
+                                            if (error){
+                                                //удаляем связанные файлы
+                                                serviceImages.forEach(function(item) {
+                                                    Meteor.call("RemoveServiceImage",item["imageId"],function(error) {
+                                                        if (error){
+                                                            console.log("Нашкобнулось сервисное удаление файла: "+error);
+                                                            callback(error);
+                                                        }
+                                                    });
+                                                });
+                                                callback(error);
+                                            }
+                                            else {
+                                                callback();
+                                            }              
+                                        });
+                                    }
+                                }
+                            });                    
+                        },500);                
                     }            
                 }
             });

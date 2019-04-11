@@ -54,15 +54,51 @@ class AdminCertificatesController extends Component{
                             certificateImageItem.imageURL = '/cfs/files/certificatesImages/' + fileObj._id;
                             certificateImageItem.imageId = fileObj._id;
                             certificateImage.push(certificateImageItem);
-                            //серверный метод обновления коллекции сертификатов
-                            Meteor.call('UpdateCertificate',certificateId,certificateDescription,certificateImage,function(error){
-                                if (error){
-                                    callback(error);
-                                } 
-                                else {
-                                    callback();
-                                }
-                            });
+
+                            //далее - наркомания с опросом состояния загрузки файла на сервере...
+                            //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
+                            //о загрузке файла на сервер...
+                            //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
+                            //когда сказал что примостился - пишем связанную коллекцию
+                            let imageWaiter = Meteor.setInterval(function(){
+                                //передаем серверу id файла для проверки наличия
+                                Meteor.call('CertificateImageOnTheServer',fileObj._id,function(error,responce){
+                                    if (error){
+                                        //гасим таймер      
+                                        Meteor.clearInterval(imageWaiter);
+                                        //удаляем связанный файл
+                                        Meteor.call("DeleteCertificateImageByImageId",certificateImage.imageId,function(error) {
+                                            if (error){                              
+                                                callback(error);
+                                            }
+                                        });
+                                        callback(error);
+                                    }
+                                    else {                                     
+                                        //если файл лежит на сервере - пишем коллекцию
+                                        if(responce){    
+                                            //гасим таймер      
+                                            Meteor.clearInterval(imageWaiter);
+                                            //пишем в связанную коллекцию
+                                            //осуществляем вызов серверного метода для работы с коллекцией
+                                            Meteor.call('UpdateCertificate',certificateId,certificateDescription,certificateImage,function(error){
+                                                if (error){
+                                                    //удаляем связанный файл
+                                                    Meteor.call("DeleteCertificateImageByImageId",certificateImage.imageId,function(error) {
+                                                        if (error){                              
+                                                            callback(error);
+                                                        }
+                                                    });
+                                                    callback(error);
+                                                } 
+                                                else {
+                                                    callback();
+                                                }
+                                            });
+                                        }
+                                    }
+                                });                    
+                            },500);    
                         }
                     });
                 }

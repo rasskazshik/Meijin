@@ -25,21 +25,50 @@ export default class UploadCertificateController extends Component{
             else {
                 //путь по умолчанию складывается из перфикса "/cfs/files", имени коллекции и идентификатора
                 let imageURL = '/cfs/files/certificatesImages/' + fileObj._id;
-                //осуществляем вызов "доверенного и безопасного" серверного метода для работы с коллекцией
-                Meteor.call("InsertCertificate",certificateDescription,imageURL,fileObj._id,function(error) {
-                    if (error){
-                        //удаляем связанный файл
-                        Meteor.call("DeleteCertificateImageByImageId",fileObj._id,function(error) {
-                            if (error){                              
-                                callback(error);
+                //далее - наркомания с опросом состояния загрузки файла на сервере...
+                //это полный неадекват, но все же... Я не нашел другого способа дождаться или просигналить  
+                //о загрузке файла на сервер...
+                //делаем таймер в полсекунды и опрашиваем файл о том как он устроился на сервере
+                //когда сказал что примостился - пишем связанную коллекцию
+                let imageWaiter = Meteor.setInterval(function(){
+                    //передаем серверу id файла для проверки наличия
+                    Meteor.call('CertificateImageOnTheServer',fileObj._id,function(error,responce){
+                        if (error){
+                            //гасим таймер      
+                            Meteor.clearInterval(imageWaiter);
+                            //удаляем связанный файл
+                            Meteor.call("DeleteCertificateImageByImageId",fileObj._id,function(error) {
+                                if (error){                              
+                                    callback(error);
+                                }
+                            });
+                            callback(error);
+                        }
+                        else {                                     
+                            //если файл лежит на сервере - пишем коллекцию
+                            if(responce){    
+                                //гасим таймер      
+                                Meteor.clearInterval(imageWaiter);
+                                //пишем в связанную коллекцию
+                                //осуществляем вызов серверного метода для работы с коллекцией
+                                Meteor.call("InsertCertificate",certificateDescription,imageURL,fileObj._id,function(error) {
+                                    if (error){
+                                        //удаляем связанный файл
+                                        Meteor.call("DeleteCertificateImageByImageId",fileObj._id,function(error) {
+                                            if (error){                              
+                                                callback(error);
+                                            }
+                                        });
+                                        callback(error);
+                                    }
+                                    else {
+                                        callback();
+                                    }              
+                                });
                             }
-                        });
-                        callback(error);
-                    }
-                    else {
-                        callback();
-                    }              
-                });
+                        }
+                    });                    
+                },500);                
             }
         });
     }

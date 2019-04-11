@@ -36,6 +36,10 @@
     background-color: #bddffd99;
 }
 
+.navigation-drop a:active{
+    background-color: #bddffd99;
+}
+
 .navigationButton{
     background-color: #ffffffb3;
     font-size:2rem;

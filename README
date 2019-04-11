@@ -13,8 +13,8 @@ To install application (VPS Ubuntu sample):
     meteor build ../buildFolder --architecture os.linux.x86_64
 4 - upload .tar.gz to the server via ssh
     scp Meijin.tar.gz user@host:/home/meteor
-5 - unpack .ter.gz file
-    tar -xf meteor.tar.gz
+5 - unpack .tar.gz file
+    tar -xf meteor
 6 - cd to folder unpacked application and install it
     cd programs/server && npm install
 7 - set environment variables 

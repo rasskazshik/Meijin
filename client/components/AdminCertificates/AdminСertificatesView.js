@@ -128,8 +128,8 @@ export default class AdminCertificatesView extends Component{
                             <textarea className='w-100 certificateDescription' onChange={this.ClearValidity} certificateid={certificate._id} autoComplete='off' required placeholder="Описание загружаемого сертификата" defaultValue={certificate.description}/>
                         </form>                       
                     </div>
-                    <input className='w-100' type='button' certificateid={certificate._id} value='Удалить подтверждение квалификации' onClick={this.DeleteCertificate}/>
-                    <input className='w-100' type='button' certificateid={certificate._id} value='Обновить данные документа квалификации' onClick={this.UpdateCertificate}/>
+                    <input className='w-100' type='button' certificateid={certificate._id} value='Удалить документ' onClick={this.DeleteCertificate}/>
+                    <input className='w-100' type='button' certificateid={certificate._id} value='Обновить данные документа' onClick={this.UpdateCertificate}/>
                     <div className='row w-100 positionButtonRow'>
                         <div className='col-md'>
                             <input type='button' className='w-100' certificateid={certificate._id} onClick={this.CertificateUp} value='Поднять в списке'/>
